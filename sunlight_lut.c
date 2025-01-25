@@ -1,4 +1,5 @@
 #include "sunlight_lut.h"
+#include "demand_response.h" // Include the DemandResponseStrategy header
 #include <modbus.h> // Include the Modbus library for RS-485 communication
 #include <curl/curl.h> // For HTTP API calls to the utility's limit order book
 #include <stdio.h>
@@ -12,6 +13,9 @@ double sunsetTable[DAYS_IN_YEAR];
 
 // Modbus context
 modbus_t *ctx;
+
+// DemandResponseStrategy instance
+DemandResponseStrategy dr_strategy;
 
 // Generate the LUT for sunrise and sunset times
 void generateSunlightLUT() {
@@ -60,8 +64,11 @@ void SpoofSOC(void *pvParameters) {
             continue;
         }
 
+        // Update SOC in the DR strategy
+        dr_strategy.current_soc = actualSOC / 100.0; // Convert to 0.0-1.0 range
+
         // Enforce 20% SOC safety latch
-        if (actualSOC < MIN_SOC) {
+        if (dr_strategy.current_soc < dr_strategy.min_soc) {
             printf("SOC below 20%. Disabling DR events.\n");
             continue;
         }
@@ -79,22 +86,18 @@ void SpoofSOC(void *pvParameters) {
 // RTOS task to handle Fast DR Dispatch
 void FastDRDispatch(void *pvParameters) {
     time_t currentTime;
-    uint16_t actualSOC;
     bool isDemandResponseActive = false; // Replace with actual DR event state
 
     for (;;) {
         currentTime = time(NULL);
 
-        // Read actual SOC from BMS via Modbus
-        if (modbus_read_input_registers(ctx, 0x208, 1, &actualSOC) == -1) {
-            fprintf(stderr, "Failed to read SOC register: %s\n", modbus_strerror(errno));
-            continue;
-        }
-
         // Fast DR Dispatch Logic
         if (isDemandResponseActive) {
-            double dischargeRate = (actualSOC / 100.0) * MAX_DISCHARGE_RATE;
-            modbus_write_register(ctx, 0x210, (uint16_t)dischargeRate); // Adjust discharge rate
+            double bid_capacity, bid_price;
+            calculate_fast_dr_bid(&dr_strategy, 0.15, 100.0, 1.0, &bid_capacity, &bid_price);
+
+            // Adjust discharge rate based on bid capacity
+            modbus_write_register(ctx, 0x210, (uint16_t)bid_capacity);
         }
 
         vTaskDelay(pdMS_TO_TICKS(1000)); // Run every second
@@ -104,22 +107,25 @@ void FastDRDispatch(void *pvParameters) {
 // RTOS task to handle Capacity Bidding
 void CapacityBidding(void *pvParameters) {
     time_t currentTime;
-    uint16_t actualSOC;
     bool isDemandResponseActive = false; // Replace with actual DR event state
+
+    // Example day-ahead prices and peak hours
+    double day_ahead_prices[24] = {0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10};
+    int expected_peak_hours[24] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0};
+    double bid_capacities[24];
+    double bid_prices[24];
 
     for (;;) {
         currentTime = time(NULL);
 
-        // Read actual SOC from BMS via Modbus
-        if (modbus_read_input_registers(ctx, 0x208, 1, &actualSOC) == -1) {
-            fprintf(stderr, "Failed to read SOC register: %s\n", modbus_strerror(errno));
-            continue;
-        }
-
         // Capacity Bidding Logic
         if (isDemandResponseActive) {
-            double bidPrice = (100.0 - actualSOC) * BID_PRICE_FACTOR;
-            submitBid(bidPrice);
+            calculate_cbp_strategy(&dr_strategy, day_ahead_prices, expected_peak_hours, 24, bid_capacities, bid_prices);
+
+            // Submit bids to the utility's limit order book
+            for (int hour = 0; hour < 24; hour++) {
+                submitBid(bid_prices[hour]);
+            }
         }
 
         vTaskDelay(pdMS_TO_TICKS(1000)); // Run every second
@@ -169,6 +175,9 @@ void initSystem() {
         modbus_free(ctx);
         return;
     }
+
+    // Initialize DemandResponseStrategy
+    DemandResponseStrategy_init(&dr_strategy, 6.5, 0.95);
 
     // Create RTOS tasks
     xTaskCreate(SpoofSOC, "SpoofSOC", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
