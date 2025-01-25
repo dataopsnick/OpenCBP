@@ -43,33 +43,32 @@ This project enables a solar battery system to participate in utility Demand Res
 
 ---
 
-## Setup Instructions
+### Setup Instructions
 
-### 1. **Connect the Gridlink Gateway**
+1. **Connect the Gridlink Gateway**:
    - Connect the Gridlink OpenADR gateway to your solar battery system using the RS485 interface.
    - Configure the gateway with the correct Modbus registers for SOC, charge/discharge status, and other relevant parameters.
 
-### 2. **Install FreeRTOS on Raspberry Pi Zero**
+2. **Install FreeRTOS on Raspberry Pi Zero**:
    - Follow the [FreeRTOS Raspberry Pi Zero guide](https://www.freertos.org/RTOS-Raspberry-Pi-Zero.html) to set up the RTOS environment.
 
-### 3. **Compile and Deploy the RTOS Application**
+3. **Compile and Deploy the RTOS Application**:
    - Clone this repository and compile the `sunlight_lut.c` and `sunlight_lut.h` files along with the RTOS application.
    - Deploy the application to the Raspberry Pi Zero.
 
-### 4. **Register with a Utility**
+4. **Register with a Utility**:
    - Sign up for a utility DR program that supports OpenADR 2.0.
    - Provide the utility with your Gridlink gateway's Virtual End Node (VEN) details.
 
-### 5. **Implement Control Logic**
+5. **Implement Control Logic**:
    - Use the provided code to automate battery responses to DR signals:
      - Discharge during CPP events.
      - Charge during off-peak periods.
      - Bid capacity for CPB programs.
 
-### 6. **Monitor and Optimize**
+6. **Monitor and Optimize**:
    - Use the Gridlink gateway's monitoring features to track battery performance and DR event responses.
    - Adjust control logic to maximize financial incentives and grid support.
-
 ---
 
 ## RTOS Application Overview
@@ -191,10 +190,10 @@ void CapacityBidding(void *pvParameters) {
 
 ## Resources
 
-- **Gridlink Technologies**: [OpenADR Certified Devices](https://gridlinktechnologies.com/open-adr-certified/)
-- **Modbus Protocol Documentation**: [Modbus Protocol](http://www.modbus.org/)
-- **OpenADR 2.0 Specification**: [OpenADR Alliance](https://www.openadr.org/)
-- **FreeRTOS Raspberry Pi Zero Guide**: [FreeRTOS Raspberry Pi Zero](https://www.freertos.org/RTOS-Raspberry-Pi-Zero.html)
+- **Gridlink Technologies**: [OpenADR Certified Devices](https://gridlinktechnologies.com/open-adr-certified/) - Learn more about OpenADR-certified devices for demand response integration.
+- **Modbus Protocol Documentation**: [Modbus Protocol](http://www.modbus.org/) - Official documentation for the Modbus communication protocol.
+- **OpenADR 2.0 Specification**: [OpenADR Alliance](https://www.openadr.org/) - Detailed specifications for OpenADR 2.0.
+- **FreeRTOS Raspberry Pi Zero Guide**: [FreeRTOS Raspberry Pi Zero](https://www.freertos.org/RTOS-Raspberry-Pi-Zero.html) - Step-by-step guide to setting up FreeRTOS on a Raspberry Pi Zero.
 
 ---
 
