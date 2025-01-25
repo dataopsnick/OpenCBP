@@ -1,6 +1,6 @@
 # Deploying openleadr-rs on AWS Lightsail
 
-This README provides instructions for deploying the `openleadr-rs` repository, which implements an OpenADR 3.0 VTN server, on AWS Lightsail. Lightsail offers a simple and affordable way to run virtual private servers, making it suitable for deploying this project.
+This README provides instructions for deploying the `openleadr-rs` (https://github.com/OpenLEADR/openleadr-rs) repository, which implements an OpenADR 3.0 VTN server, on AWS Lightsail. Lightsail offers a simple and affordable way to run virtual private servers, making it suitable for deploying this project.
 
 ## Prerequisites
 
