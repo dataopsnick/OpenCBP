@@ -35,12 +35,12 @@ OpenCBP enables solar battery systems to participate in utility Demand Response 
 
 | Strategy | Annual Revenue ($) | Battery Cycles | Effective $/kWh | Profit Margin (%) |
 |----------|-------------------|----------------|-----------------|-------------------|
-| OpenCBP Nash Equilibrium | 438.72 | 183 | 0.367 | 29.5 |
-| Fixed-margin (10%) | 356.29 | 217 | 0.254 | 18.1 |
-| Price-threshold | 394.51 | 168 | 0.361 | 22.7 |
-| Naive peak-shaving | 312.84 | 246 | 0.196 | 13.9 |
+| OpenCBP Nash Equilibrium | XXX.XX | XXX | X.XXX | XX.X |
+| Fixed-margin (10%) | XXX.XX | XXX | X.XXX | XX.X |
+| Price-threshold | XXX.XX | XXX | X.XXX | XX.X |
+| Naive peak-shaving | XXX.XX | XXX | X.XXX | XX.X |
 
-Simulation results using real-world 2023 California ISO (CAISO) market data demonstrate that OpenCBP's bidding strategy outperforms traditional fixed-margin bidding by 17-23% in terms of annual revenue while maintaining system reliability and extending battery lifespan, with statistical significance at p < 0.01.
+**Note**: Performance results are pending completion of empirical simulation studies using LFP-specific degradation parameters and 2023 California ISO (CAISO) market data. Preliminary analysis indicates significant revenue improvements and reduced battery cycling compared to traditional bidding strategies, with statistical significance testing underway.
 
 ---
 
