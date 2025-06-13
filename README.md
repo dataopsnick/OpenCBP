@@ -9,7 +9,7 @@ OpenCBP enables solar battery systems to participate in utility Demand Response 
 ## Key Features
 
 ### Advanced Bidding Strategies
-- **Game-Theoretic Nash Equilibrium Bidding**: Optimizes bid pricing based on market competition and grid demand dynamics
+- **Game-Theoretic Bidding**: Optimizes bid pricing based on market competition and grid demand dynamics
 - **Non-Linear Battery Degradation Modeling**: Incorporates physics-based degradation costs using rainflow cycle counting
 - **Dynamic Opportunity Cost Calculation**: Considers potential revenue from reserving capacity for high-value future DR events
 - **Multi-Program Optimization**: Simultaneously optimizes across fast DR dispatch and capacity bidding markets
@@ -35,7 +35,7 @@ OpenCBP enables solar battery systems to participate in utility Demand Response 
 
 | Strategy | Annual Revenue ($) | Battery Cycles | Effective $/kWh | Profit Margin (%) |
 |----------|-------------------|----------------|-----------------|-------------------|
-| OpenCBP Nash Equilibrium | XXX.XX | XXX | X.XXX | XX.X |
+| OpenCBP Price | XXX.XX | XXX | X.XXX | XX.X |
 | Fixed-margin (10%) | XXX.XX | XXX | X.XXX | XX.X |
 | Price-threshold | XXX.XX | XXX | X.XXX | XX.X |
 | Naive peak-shaving | XXX.XX | XXX | X.XXX | XX.X |
@@ -79,7 +79,7 @@ The implementation consists of several key files:
 
 1. **demand_response.h/c**: Core bidding strategy implementation
    - Non-linear battery degradation model
-   - Nash equilibrium price calculation
+   - Optimal price calculation
    - Capacity allocation algorithms
    - Opportunity cost estimation
 
@@ -142,7 +142,7 @@ The system creates three main RTOS tasks:
 
 2. **FastDRDispatch Task**:
    - Calculates optimal bid price and capacity for real-time DR events
-   - Uses Nash equilibrium pricing to maximize profits
+   - Uses min-max pricing to drive price efficiency
    - Adjusts discharge based on grid signals and battery SOC
 
 3. **CapacityBidding Task**:
