@@ -32,7 +32,7 @@
 \maketitle
 
 \begin{abstract}
-This paper presents a game-theoretic approach to optimizing bidding strategies for distributed energy resources (DERs), specifically Lithium Iron Phosphate (LFP) battery systems, participating in demand response (DR) markets. The proposed methodology, implemented in the OpenCBP (Open Capacity Bidding Program) framework, employs heuristics derived from non-cooperative game theory to balance profit-maximizing behavior with system reliability constraints. We introduce a dynamic bidding model that accounts for LFP battery degradation (using a model informed by \citet{Millner2010}), the availability of self-generated solar power (via a sunlight look-up table), time-of-use pricing, and grid demand factors to determine bid capacity and pricing. Our approach addresses limitations of simpler DR frameworks by more comprehensively modeling energy storage degradation costs and opportunity costs (via heuristics) in multi-participant market environments. Simulation results using real-world 2023 California ISO (CAISO) market data are expected to demonstrate significant performance improvements\footnote{Empirical results pending completion of simulation studies with LFP-specific parameters.}. The framework provides a practical and computationally efficient implementation for solar-LFP battery systems on resource-constrained hardware, enabling maximized economic returns while supporting grid stability through automated participation in fast dispatch and capacity bidding markets.
+This paper presents a game-theoretic approach to optimizing bidding strategies for distributed energy resources (DERs), specifically Lithium Iron Phosphate (LFP) battery systems, participating in demand response (DR) markets. The proposed methodology, implemented in the OpenCBP (Open Capacity Bidding Program) framework, employs heuristics inspired by game-theoretic principles to balance profit-maximizing behavior with system reliability constraints. We introduce a dynamic bidding model that accounts for LFP battery degradation (using a model informed by \citet{Millner2010}), the availability of self-generated solar power (via a sunlight look-up table), time-of-use pricing, and grid demand factors to determine bid capacity and pricing. Our approach addresses limitations of simpler DR frameworks by more comprehensively modeling energy storage degradation costs and opportunity costs (via heuristics) in multi-participant market environments. Simulation results using real-world 2023 California ISO (CAISO) market data are expected to demonstrate significant performance improvements\footnote{Empirical results pending completion of simulation studies with LFP-specific parameters.}. The framework provides a practical and computationally efficient implementation for solar-LFP battery systems on resource-constrained hardware, enabling maximized economic returns while supporting grid stability through automated participation in fast dispatch and capacity bidding markets.
 \end{abstract}
 
 \section{Introduction}
@@ -74,7 +74,7 @@ Our review of the literature reveals several critical gaps:
 
 Our work addresses these gaps through:
 \begin{itemize}
-    \item A bidding strategy informed by non-cooperative game theory, implemented with computationally efficient heuristics that continuously adapt to changing market conditions and participant behaviors, extending beyond \citet{Nekouei2015}'s static equilibrium model.
+    \item A bidding strategy inspired by game-theoretic principles, implemented with computationally efficient heuristics that adapt to changing market conditions and participant behaviors, providing a practical alternative to complex equilibrium-based approaches like \citet{Nekouei2015}.
     \item Integration of a non-linear LFP battery degradation cost model (based on \citet{Millner2010}'s principles and parameterized for an ExpertPower EP512100 LFP battery) into marginal cost calculations, using rainflow-counting for cycle accumulation.
     \item Incorporation of a sunlight look-up table (LUT) to dynamically adjust the base energy cost ($C_{base}(t)$) based on the availability of self-generated solar power.
     \item An open-source C-based implementation framework (OpenCBP) designed for resource-constrained edge devices (e.g., Raspberry Pi Zero), addressing practical limitations unresolved by \citet{Iria2019} and \citet{Lakshmanan2021}.
@@ -197,29 +197,19 @@ C_{opp}(t) = \mathbb{E}\left[ \max_{t' > t} (p_{t'} - MC(t', SoC')) \right]
 
 where $\mathbb{E}$ represents the expected value operator over future price scenarios, and $SoC'$ is the projected future state of charge after considering the current discharge decision. In the OpenCBP implementation, for computational tractability on embedded hardware, $C_{opp}(t)$ is approximated by a heuristic. This heuristic considers a discounted maximum of forecasted future prices (as detailed in the implementation of the `calculate_opportunity_cost` function within the C code), rather than a full recursive DP solution incorporating future SoC and MC states. This provides a practical balance between optimality and computational feasibility.
 
-\subsection{Non-Cooperative Game Formulation}
-We model the DR market as a non-cooperative game where multiple BESS operators compete to maximize their individual profits. Each participant $i$ faces the following optimization problem:
+\subsection{Competitive Market Modeling}
+We model the DR market as a competitive environment where multiple BESS operators compete for limited grid demand. While a full game-theoretic analysis would require modeling each participant's strategy and proving equilibrium existence, we employ a simplified approach that captures key competitive dynamics through heuristic markup functions.
 
-\begin{equation}
-\max_{p_i, q_i} \pi_i(p_i, q_i; p_{-i}, q_{-i})
-\end{equation}
-
-where $\pi_i$ is the profit function, $(p_i, q_i)$ are the price and quantity bids of participant $i$, and $(p_{-i}, q_{-i})$ represents the bids of all other participants.
-
-The clearing price $p^*$ is determined by the market operator based on the submitted bids and grid demand $D_{grid}$:
+The clearing price $p^*$ is determined by the market operator based on submitted bids and grid demand $D_{grid}$:
 
 \begin{equation}
 p^* = \min\{p_i | \sum_{j: p_j \leq p_i} q_j \geq D_{grid}\}
 \end{equation}
 
-A Nash equilibrium occurs when no participant can unilaterally increase their profit by changing their bid:
+Our approach approximates competitive behavior by adjusting bid prices based on observed market conditions (demand levels and estimated competition) rather than solving for theoretical equilibrium strategies.
 
-\begin{equation}
-\pi_i(p_i^*, q_i^*; p_{-i}^*, q_{-i}^*) \geq \pi_i(p_i, q_i; p_{-i}^*, q_{-i}^*) \quad \forall p_i, q_i, \forall i
-\end{equation}
-
-\subsection{Equilibrium Bidding Strategy}
-Based on the non-cooperative game formulation, we derive the optimal bidding strategy for a price-taking BESS operator:
+\subsection{Competitive Bidding Strategy}
+Motivated by competitive market dynamics, we develop a practical bidding strategy that adapts to market conditions:
 
 \begin{equation}
 p_{bid} = \max(MC, p_{min}) \cdot (1 + \mu(D_{grid}, N))
@@ -231,7 +221,7 @@ where $MC$ is the marginal cost (calculated as per Eq. 6), $p_{min}$ is a pre-de
 \mu(D_{grid}, N) = \alpha \cdot \frac{D_{grid}/D_{max}}{N \cdot \beta + 1}
 \end{equation}
 
-where $\alpha$ is a scaling parameter (typically 0.2-0.4), $D_{max}$ is the maximum historical grid demand, and $\beta$ is a competition factor (typically 0.1-0.3). This formulation ensures that the markup increases with grid demand and decreases with more market participants, reflecting competitive market dynamics.
+where $\alpha$ is a scaling parameter (typically 0.2-0.4), $D_{max}$ is the maximum historical grid demand, and $\beta$ is a competition factor (typically 0.1-0.3). This heuristic formulation is designed so that markup increases with grid demand and decreases with more market participants, capturing observed competitive market dynamics. The parameters $\alpha$ and $\beta$ are empirically determined based on historical market performance rather than derived from theoretical equilibrium conditions.
 
 \subsection{Bid Capacity Determination}
 The bid capacity $q_t$ is determined based on the available LFP battery capacity and the expected profitability:
@@ -267,7 +257,7 @@ where $B_{cap,available} = B_{cap} \cdot (SoC_{max} - SoC_{min})$, $p_{DA,h}$ is
 The bidding strategy is implemented in the OpenCBP framework using the C programming language for computational efficiency. The system initializes by generating a sunlight Look-Up Table (LUT) specific to its geographical location (latitude, longitude). This LUT provides daily sunrise and sunset times, which are subsequently used by the financial model to estimate the availability of solar energy and adjust the base energy cost ($C_{base}(t)$) accordingly. Algorithm \ref{alg:bidding} shows the pseudocode for the main bidding algorithm.
 
 \begin{algorithm}
-\caption{Optimal Bidding Strategy Determination}
+\caption{Competitive Bidding Strategy Determination}
 \label{alg:bidding}
 \begin{algorithmic}[1]
 \Procedure{OptimalBidding}{$B_{cap}, SoC, \eta, T, p_{forecast}, D_{grid}, N, p_{min}$}
@@ -457,7 +447,7 @@ The results demonstrate that the OpenCBP algorithm, while more computationally i
 \subsection{Theoretical Implications}
 The performance advantage of the OpenCBP strategy stems from several key theoretical insights adapted for practical, efficient implementation:
 
-\textbf{Strategic Pricing in Non-Cooperative Markets}: Unlike fixed-margin approaches that ignore market dynamics, our strategy, informed by non-cooperative game theory, explicitly models the strategic interaction between market participants through a markup function. This allows the LFP BESS operator to adapt their bidding strategy based on observed competition levels and grid demand patterns.
+\textbf{Competition-Aware Pricing}: Unlike fixed-margin approaches that ignore market dynamics, our strategy uses heuristics inspired by game-theoretic principles to model competitive interactions through a markup function. This allows the LFP BESS operator to adapt their bidding strategy based on observed competition levels and grid demand patterns, without requiring complex equilibrium calculations.
 
 \textbf{LFP-Specific Non-Linear Battery Degradation Modeling}: By incorporating a physics-based non-linear degradation model (informed by \citet{Millner2010}) specifically for LFP batteries, OpenCBP more accurately accounts for the true marginal cost of energy delivery. This leads to more economically efficient decisions about when to participate in DR events, particularly avoiding situations where nominal profits would be offset by accelerated battery degradation.
 
