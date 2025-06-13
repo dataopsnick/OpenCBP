@@ -79,7 +79,7 @@ The implementation consists of several key files:
 
 1. **demand_response.h/c**: Core bidding strategy implementation
    - Non-linear battery degradation model
-   - Optimal price calculation
+   - Competitive price calculation
    - Capacity allocation algorithms
    - Opportunity cost estimation
 
