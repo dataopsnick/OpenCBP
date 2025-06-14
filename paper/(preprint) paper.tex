@@ -288,7 +288,7 @@ The bidding strategy is implemented in the OpenCBP framework using the C program
 \end{algorithmic}
 \end{algorithm}
 
-The algorithm, as outlined, has a time complexity of O($|T|$), where $|T|$ is the number of time periods being evaluated for a single bidding decision. Space complexity is O(1) as it primarily stores the best bid found so far and associated profit. Benchmark tests on the Raspberry Pi Zero show an average execution time of 12.4ms per time period evaluation, allowing real-time decision-making even with limited computational resources. This computational efficiency is aligned with the design goals for the embedded OpenCBP system.
+The algorithm, as outlined, has a time complexity of O($|T|$), where $|T|$ is the number of time periods being evaluated for a single bidding decision. Space complexity is O(1) as it primarily stores the best bid found so far and associated profit. Benchmark tests on the Raspberry Pi Zero show an average execution time of XX.Xms per time period evaluation, allowing real-time decision-making even with limited computational resources. This computational efficiency is aligned with the design goals for the embedded OpenCBP system.
 
 Implementation optimizations include:
 \begin{itemize}
@@ -410,7 +410,7 @@ Naive peak-shaving & \textcolor{magenta}{XXX.XX} $\pm$ \textcolor{magenta}{XX.X}
 \end{table}
 \footnotesize{\textit{Note: Values highlighted in \textcolor{magenta}{magenta} are placeholders pending completion of empirical simulation studies using the LFP-specific degradation model and ExpertPower EP512100 battery parameters. Final results will be based on Monte Carlo simulations using 2023 CAISO market data.}}
 
-While the OpenCBP algorithm requires more computational resources than the baseline strategies, its runtime remains well within the constraints of real-time operation on resource-constrained devices. The decision cycle time of 12.4ms (per time period evaluation) is significantly shorter than the minimum market response time requirement of 4 seconds for Fast DR programs, ensuring timely bid submissions even under peak load conditions.
+While the OpenCBP algorithm requires more computational resources than the baseline strategies, its runtime remains well within the constraints of real-time operation on resource-constrained devices. The decision cycle time of XX.Xms (per time period evaluation) is significantly shorter than the minimum market response time requirement of 4 seconds for Fast DR programs, ensuring timely bid submissions even under peak load conditions.
 
 Paired t-tests are expected to confirm statistically significant improvements for the OpenCBP strategy over baseline approaches. Preliminary analysis suggests:
 \begin{itemize}
