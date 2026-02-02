@@ -195,10 +195,10 @@ The opportunity cost $C_{opp}(t)$ is ideally calculated using a dynamic programm
 C_{opp}(t) = \mathbb{E}\left[ \max_{t' > t} (p_{t'} - MC(t', SoC')) \right]
 \end{equation}
 
-where $\mathbb{E}$ represents the expected value operator over future price scenarios, and $SoC'$ is the projected future state of charge after considering the current discharge decision. In the OpenCBP implementation, for computational tractability on embedded hardware, $C_{opp}(t)$ is approximated by a heuristic. This heuristic considers a discounted maximum of forecasted future prices (as detailed in the implementation of the `calculate_opportunity_cost` function within the C code), rather than a full recursive DP solution incorporating future SoC and MC states. This provides a practical balance between optimality and computational feasibility.
+where $\mathbb{E}$ represents the expected value operator over future price scenarios, and $SoC'$ is the projected future state of charge after considering the current discharge decision. In the OpenCBP implementation, for computational tractability on embedded hardware, $C_{opp}(t)$ is approximated by a heuristic. This heuristic considers a discounted maximum of forecasted future prices (as detailed in the implementation of the `calculate\_opportunity\_cost` function within the C code), rather than a full recursive DP solution incorporating future SoC and MC states. This provides a practical balance between optimality and computational feasibility.
 
 \subsection{Competitive Market Modeling}
-We model the DR market as a competitive environment where multiple BESS operators compete for limited grid demand. While a full game-theoretic analysis would require modeling each participant's strategy and proving equilibrium existence, we employ a simplified approach that captures key competitive dynamics through heuristic markup functions.
+We model the DR market as a  environment where multiple BESS operators compete for limited grid demand. While a full game-theoretic analysis would require modeling each participant's strategy and proving equilibrium existence, we employ a simplified approach that captures key competitive dynamics through heuristic markup functions.
 
 The clearing price $p^*$ is determined by the market operator based on submitted bids and grid demand $D_{grid}$:
 
